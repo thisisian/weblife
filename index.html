@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>web-clife</title>
+        <script type="text/javascript" src="clife-web.js"></script>
+<style>
+.display {
+    margin: auto;
+    padding:20px;
+}
+.ctrlpanel {
+    margin: auto;
+    background-color: lightgray;
+    padding: 20px;
+    width: 50%;
+}
+</style>
+    </head>
+
+    <body onload=init()>
+        <div class="display">
+            <center>
+                <canvas id="theGrid" width="200" height="100" style="border:1px solid #000000;margin:auto;"></canvas> 
+            </center>
+        </div>
+
+        <div class="ctrlpanel" style="margin:auto">
+        <button type="button" onclick="ui.step()">Step</button>
+        <button type="button" onclick="ui.pause()">Pause</button>
+        <button type="button" onclick="ui.play()">Play</button>
+        <span>&nbsp;&nbsp;<span id="playStatus">&#9646;&#9646;</span></span>
+
+        <p> 
+        Width: 
+        <input type="text" style="width:4ch" id="randW"></input>
+        Height:
+        <input type="text" style="width:4ch" id="randH"></input>
+        Density: 
+        <input type="text" style="width:4ch" id="randD"></input>
+        <button type="button" onclick="ui.soup()">Random Soup</button>
+        </p>
+
+
+        <p>
+        Rule String (B/S notation): <input type="text" style="width:15ch" id="rulesInput" value="b3/s23"></input>
+        <span><button type="button" onclick="ui.updateRules()">Load Ruleset</button></span>
+        </p>
+
+        
+        <p style="margin:auto"><span id="status" style="color:red"></span></p>
+        </div>
+    </body>
+</html>
