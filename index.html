@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<meta charset="UTF-8">
 <html>
     <head>
         <title>web-clife</title>
@@ -17,7 +18,7 @@
 </style>
     </head>
 
-    <body onload=init()>
+    <body onload=ui.init()>
         <div class="display">
             <center>
                 <canvas id="theGrid" width="200" height="100" style="border:1px solid #000000;margin:auto;"></canvas> 
@@ -32,12 +33,12 @@
 
         <p> 
         Width: 
-        <input type="text" style="width:4ch" id="randW"></input>
+        <input type="text" style="width:4ch" id="width"></input>
         Height:
-        <input type="text" style="width:4ch" id="randH"></input>
+        <input type="text" style="width:4ch" id="height"></input>
         Density: 
-        <input type="text" style="width:4ch" id="randD"></input>
-        <button type="button" onclick="ui.soup()">Random Soup</button>
+        <input type="text" style="width:4ch" id="density"></input>
+        <button type="button" onclick="ui.newMap()">Random Soup</button>
         </p>
 
 
