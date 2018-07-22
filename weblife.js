@@ -1,43 +1,84 @@
-function ruleSet (ruleString) {
-    this.ruleArray = this.parseRuleString(ruleString);
+'use strict';
 
-    parseRuleString(ruleString) {
-        // Confirm correct format, fail if its wrong
-        // return array
+import {testMain} from "tests.js";
+
+function InvalidArgumentException(message) {
+    this.message = message;
+    this.name = "InvalidArgumentException"
+}
+
+class RuleSet {
+    constructor(ruleString) {
+        this.ruleArray = this.parseRuleString(ruleString);
     }
 
+    parseRuleString(ruleString) {
+        let re = /^\s*b([0-8]+)\/s([0-8]+)\s*$/i;
+        let ruleList = re.match(ruleString);
+        let ruleArray =[[0, 0, 0, 0, 0, 0, 0, 0, 0],    // Birth
+                        [0, 0, 0, 0, 0, 0, 0, 0, 0]];   // Survive
+        if (ruleList == null) {
+            throw new InvalidArgumentException("Invalid rulestring");
+        }
+        ruleList[1]
+            .map(parseInt)
+            .forEach( x => ruleArray[0][x] = 1 );
+        ruleList[2]
+            .map(parseInt)
+            .forEach( x => ruleArray[1][x] = 1 );
+        return ruleArray;
+    }
 }
 
-function dimentions (cols, rows) {
-    this.dimentions = [cols, rows];
-}
+class Engine {
+    constructor(cols, rows, ruleString) {
+        this.cols = cols;
+        this.rows = rows;
+        this.rules = new RuleSet(ruleString);
+        this.cells = new Uint8ClampedArray(new ArrayBuffer(cols * rows));
+    }
 
-function engine (cols, rows, ruleString) {
-    this.cols = cols;
-    this.rows = rows;
-    this.rules = new RuleSet(ruleString);
-    this.cells = Array(cols * rows);
-
-    step: function () {
+    step() {
         // TODO
         // this function should call the necessary functions to deal with
         // stepping the grid from one state to the next
     },
 
-    generateSoup: function (density) {
-        // TODO
-        // should iterate thru cell array and fill a square with density
-    },
-
-    getCells: function() {
-        return this.cells;
+    generateSoup (density) {
+        this.cells
+            .map(x => {
+                if (Math.random() > density) {
+                    return 1;
+                }
+                return 0;
+            })
     }
 
-    getCols: function() {
-        return this.cols;
+    setCell(xpos, ypos, value) {
+        this.cells[getArrayIndex(xpos,ypos)] = value;
     }
 
+    getCell(xpos, ypos) {
+        return this.cells[getArrayIndex(xpos, ypos)]
+    }
 
+    // Returns the array index corresponding to coordinates (xpos, ypos)
+    // TODO: respects toroid plane
+    getArrayIndex(xpos, ypos) {
+        return xpos + ypos * this.cols;
+    }
+
+    getCoordinates(arrayIndex) {
+        return
+    }
+
+    getCells() {
+        return cells;
+    }
+
+    getCols() {
+        return cols;
+    }
 }
 
 function display (cols, rows, cellSize) {
@@ -116,6 +157,8 @@ let ui = {
 
 // Gets called on page load
 function init() {
+    testMain();
+
     window.onresize = gridDisplay.update();
     gridDisplay.canvas.addEventListener("click", function toggle(event) {
         let x = ftoi((event.pageX - gridDisplay.left) / gridDisplay.cellSize);
@@ -151,5 +194,7 @@ function loadBitmap() {
 }
 
 function updRules() {
+    error("");
+    rules = document.getElementById("rulesInput").value;
 }
 
