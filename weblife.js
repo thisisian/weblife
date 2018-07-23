@@ -247,13 +247,17 @@ let ui = {
     },
 
     step : function () {
+        console.log("hello")
         this.engine.step();
         this.display.update();
     },
 
     play : function () {
         clearInterval(this.interval);
-        this.interval = setInterval(this.engine.step(), 100);
+        this.interval = setInterval(() => {
+                this.engine.step();
+                this.display.update();
+            }, 1);
         document.getElementById("playStatus").innerHTML = "&#9654;";
     },
 
@@ -276,4 +280,3 @@ let ui = {
 function floor(x) {
     return x | 0;
 }
-
