@@ -2,20 +2,37 @@
 
 function InvalidArgumentException(message) {
     this.message = message;
-    this.name = "InvalidArgumentException"
+    this.name = "InvalidArgumentException";
 }
 
+/**
+ * Class for storing rule array and parsing rule strings.
+ */
 class RuleSet {
+    /**
+     * Builds a rule set from given rule string in B/S format.
+     *
+     * @param {string} ruleString Rule for which to build rule set from.
+     * Takes B/S format
+     * (see http://www.conwaylife.com/w/index.php?title=Rulestring)
+     */
     constructor(ruleString) {
         this.ruleArray = this.parseRuleString(ruleString);
     }
 
+    /**
+     * Parses ruleString and returns a rule array for determining
+     * next generation of cells.
+     *
+     * @param {string} ruleString Rule string in B/S notation
+     * @returns {} Resulting rule array
+     */
     parseRuleString(ruleString) {
         let re = /^\s*b([0-8]+)\/s([0-8]+)\s*$/i;
         let ruleList = ruleString.match(re);
         let ruleArray =[[0, 0, 0, 0, 0, 0, 0, 0, 0],    // Birth
                         [0, 0, 0, 0, 0, 0, 0, 0, 0]];   // Survive
-        if (ruleList == null) {
+        if (ruleList === null) {
             throw new InvalidArgumentException("Invalid rulestring");
         }
         ruleList[1]
@@ -29,6 +46,10 @@ class RuleSet {
         return ruleArray;
     }
 
+    /**
+     * Returns rule string in B/S format.
+     * @returns {string} Rule string in B/S format.
+     */
     getRuleString() {
         let str = "b";
         for (let i = 0; i < this.ruleArray[0].length; ++i) {
@@ -45,26 +66,45 @@ class RuleSet {
     }
 }
 
+/**
+ * Class holding methods relating to evaluation of cell grid and
+ * determining next generation.
+ */
 class Engine {
-    constructor(cols, rows, ruleString, density) {
-        this.cols = cols;
-        this.rows = rows;
+    /**
+     * Create an engine instance.
+     *
+     * @param numCols Number of columns in cell grid.
+     * @param numRows Number of rows in cell grid.
+     * @param ruleString Initial rule string governing generational behavior.
+     * @param density Density of initial, random pattern.
+     */
+    constructor(numCols, numRows, ruleString, density) {
+        this.cols = numCols;
+        this.rows = numRows;
         this.rules = new RuleSet(ruleString);
-        this.cells = new Uint8ClampedArray(new ArrayBuffer(cols * rows));
-        this.buff = new Uint8ClampedArray(new ArrayBuffer(cols * rows));
+        this.cells = new Uint8ClampedArray(new ArrayBuffer(numCols * numRows));
+        this.buff = new Uint8ClampedArray(new ArrayBuffer(numCols * numRows));
         this.generateSoup(density);
     }
 
+    /**
+     * Steps the engine to the next generation.
+     */
     step() {
         let i;
         for (i = 0; i < this.cols * this.rows; ++i) {
-            this.buff[i] = this.evaluateCell(i);
+            this.buff[i] = this.nextState(i);
         }
         let temp = this.buff;
         this.buff = this.cells;
         this.cells = temp;
     }
 
+    /**
+     * Generates a random pattern of given density.
+     * @param density Density of pattern where 0.0 < density < 1.0
+     */
     generateSoup(density) {
         let i;
         for (i = 0; i < this.rows*this.cols; ++i) {
@@ -76,79 +116,144 @@ class Engine {
         }
     }
 
-    evaluateCell(arrayIndex) {
-        let currentState = this.getCellIndex(arrayIndex);
+    /**
+     * Evaluates given cell's state and returns value of new
+     * state in next generation.
+     * @param arrayIndex Index of cell to be evaluated.
+     * @returns {number} New state of cell.
+     */
+    nextState(arrayIndex) {
+        let currentState = this.getCellStateFromIndex(arrayIndex);
         let sum = this.sumNeighbors(arrayIndex);
         if (currentState === 0) {
             return this.rules.ruleArray[0][sum];
         } else if (currentState === 1) {
             return this.rules.ruleArray[1][sum];
         } else {
-            console.log("evaluateCell: invalid inital state");
+            console.log("nextState: invalid initial state");
         }
     }
 
+    /**
+     * Sums the states of the Moore neighbors of cell at given index
+     *
+     * @param arrayIndex Index of cell whose neighbors will be summed.
+     * @returns {number} Sum of states of neighbors
+     */
     sumNeighbors(arrayIndex) {
-        let coords = this.getCoordinates(arrayIndex);
+        let coords = this.indexToCoord(arrayIndex);
         let x = coords[0];
         let y = coords[1];
-        return this.getCell([x+1, y+1]) +
-               this.getCell([x, y+1]) +
-               this.getCell([x-1, y+1]) +
-               this.getCell([x-1, y]) +
-               this.getCell([x+1, y]) +
-               this.getCell([x+1, y-1]) +
-               this.getCell([x, y-1]) +
-               this.getCell([x-1, y-1]);
+        return this.getCellState([x+1, y+1]) +
+               this.getCellState([x, y+1]) +
+               this.getCellState([x-1, y+1]) +
+               this.getCellState([x-1, y]) +
+               this.getCellState([x+1, y]) +
+               this.getCellState([x+1, y-1]) +
+               this.getCellState([x, y-1]) +
+               this.getCellState([x-1, y-1]);
     }
 
+    /**
+     * Set cell at given coordinates to a given state.
+     * @param coords Coordinate of cell to change.
+     * @param state State to change cell to.
+     */
     setCell(coords, state) {
-        this.cells[this.getArrayIndex(coords)] = state;
+        this.cells[this.coordToIndex(coords)] = state;
     }
 
+    /**
+     * Updates the engine's rule set.
+     *
+     * @param ruleString {string} String to be parsed to
+     * generate new rule set from.
+     */
+    setRules(ruleString) {
+        this.rules = new RuleSet(ruleString);
+    }
+
+    /**
+     * Toggles cell at coordinate location on/off.
+     * @param coords {[number,number]} x, y coordinate of cell to be toggled
+     */
     toggleCell(coords) {
-        if (this.cells[this.getArrayIndex(coords)] === 1) {
-            this.cells[this.getArrayIndex(coords)] = 0;
+        if (this.cells[this.coordToIndex(coords)] === 1) {
+            this.cells[this.coordToIndex(coords)] = 0;
         } else {
-            this.cells[this.getArrayIndex(coords)] = 1;
+            this.cells[this.coordToIndex(coords)] = 1;
         }
     }
 
-    getCell(coords) {
-        return this.cells[this.getArrayIndex(coords)]
+    /**
+     * Returns cell state at given coordinates. Respects toroid plane.
+     *
+     * @param coords Coordinates of cell to get state from.
+     * @returns {number} State of cell.
+     */
+    getCellState(coords) {
+        return this.cells[this.coordToIndex(coords)];
     }
 
-    getCellIndex(index){
+    /**
+     * Returns cell state at given index in cell array.
+     *
+     * @param index Index of cell to get state from.
+     * @returns {number} State of cell.
+     */
+    getCellStateFromIndex(index){
         return this.cells[index];
     }
 
-    // Returns the array index corresponding to coordinates
-    getArrayIndex(coords) {
+
+    /**
+     * Returns array index corresponding to given coordinates.
+     *
+     * @param coords Coordinates to translate to array index.
+     * @returns {number} Array index of given coordinates.
+     */
+    coordToIndex(coords) {
         let x = (coords[0] % this.cols + this.cols) % this.cols;
         let y = (coords[1] % this.rows + this.rows) % this.rows;
         return x + y * this.cols;
     }
 
-    getCoordinates(arrayIndex) {
+    /**
+     * Translates an cell grid index to coordinates.
+     * @param arrayIndex Index to translate.
+     * @returns {[number,number]} x/y coordinates of index.
+     */
+    indexToCoord(arrayIndex) {
         return [arrayIndex % this.cols, floor(arrayIndex / this.cols)];
     }
 
+    /**
+     * Returns the number of columns of cell grid.
+     * @returns {number} Number of columns of cell grid.
+     */
     getCols() {
         return this.cols;
     }
 
+    /**
+     * Returns the number of rows of cell grid.
+     * @returns {number} Number of rows of cell grid.
+     */
     getRows() {
         return this.rows;
     }
 
+    /**
+     * Prints the cell grid to the console.
+     */
     printGrid() {
-        var str = "";
-        var i;
+        let str = "";
+        let i;
         for (i = 0; i < this.rows*this.cols; ++i) {
-            if (i % this.cols == 0) {
-                str += "\n"
+            if (i % this.cols === 0) {
+                str += "\n";
             }
-            if (this.getCellIndex(i) === 1)
+            if (this.getCellStateFromIndex(i) === 1)
                 str += "1";
             else
                 str += "0";
@@ -157,7 +262,15 @@ class Engine {
     }
 }
 
-class Display  {
+/**
+ * Class holding methods relating to display of cell grid.
+ */
+class Display {
+    /**
+     * Constructs a display object for given engine.
+     *
+     * @param engine Engine which is being displayed.
+     */
     constructor (engine) {
         this.engine = engine;
         this.cellSize = undefined;
@@ -171,7 +284,6 @@ class Display  {
         this.canvas.addEventListener("click", (event) => {
             let coords = this.findCoord(event);
             this.engine.toggleCell(coords);
-            console.log(this.engine.evaluateCell(this.engine.getArrayIndex(coords)))
             this.update();
         }, false);
 
@@ -179,13 +291,21 @@ class Display  {
         this.update();
     }
 
-    // Finds coordinates of click location
-    findCoord(event) {
-        let x = floor((event.pageX - this.left) / this.cellSize);
-        let y = floor((event.pageY - this.top) / this.cellSize);
+    /**
+     * Returns x,y coordinates of click event on display grid.
+     * @param clickEvent Click event.
+     * @returns {[number,number]} x,y coordinate of clicked cell
+     */
+    findCoord(clickEvent) {
+        let x = floor((clickEvent.pageX - this.left) / this.cellSize);
+        let y = floor((clickEvent.pageY - this.top) / this.cellSize);
         return [x,y];
     }
 
+    /**
+     * Loads engine properties into display.
+     * @param engine Engine which is displayed.
+     */
     loadEngine(engine) {
         this.engine = engine;
         this.cols = this.engine.getCols();
@@ -205,17 +325,20 @@ class Display  {
         this.left = this.canvas.offsetLeft;
     }
 
+    /**
+     * Updates display from engine state
+     */
     update() {
+        let xpos = 0, ypos = 0;
+        let i;
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-        var xpos = 0, ypos = 0;
-        var i;
         this.ctx.strokeStyle = "#E0E0E0";
         for (i = 0; i < this.cols*this.rows; i++) {
             if (i % this.cols === 0 && i !== 0) {
                 ypos += this.cellSize;
                 xpos = 0;
             }
-            if (this.engine.getCellIndex(i) === 1) {
+            if (this.engine.getCellStateFromIndex(i) === 1) {
                 this.ctx.fillRect(xpos, ypos, this.cellSize, this.cellSize);
             }
             if (this.cellSize > 5) {
@@ -226,7 +349,12 @@ class Display  {
     }
 }
 
+/**
+ * Object holding methods which are called by web page.
+ * Holds current engine and display objects as well.
+ */
 let ui = {
+    PLAYBACK_SPEED: 50,
     interval: undefined,
     engine: undefined,
     display: undefined,
@@ -247,7 +375,6 @@ let ui = {
     },
 
     step : function () {
-        console.log("hello")
         this.engine.step();
         this.display.update();
     },
@@ -257,7 +384,7 @@ let ui = {
         this.interval = setInterval(() => {
                 this.engine.step();
                 this.display.update();
-            }, 1);
+            }, this.PLAYBACK_SPEED);
         document.getElementById("playStatus").innerHTML = "&#9654;";
     },
 
@@ -266,9 +393,13 @@ let ui = {
         document.getElementById("playStatus").innerHTML = "&#9646;&#9646;";
     },
 
-    updateRules : function () {
+    setRules : function () {
         let ruleString = document.getElementById("rulesInput").value;
-
+        try {
+            this.engine.setRules(ruleString);
+        } catch (error) {
+            console.log(error);
+        }
     },
 
     sendError : function (input) {
