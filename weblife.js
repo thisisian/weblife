@@ -347,6 +347,13 @@ class Display {
             xpos += this.cellSize;
         }
     }
+
+    /**
+     * Updates dimentions from size of display container
+     */
+    updateDimentions() {
+
+    }
 }
 
 /**

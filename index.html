@@ -1,54 +1,81 @@
 <!DOCTYPE html>
 <meta charset="UTF-8">
 <html>
-    <head>
-        <title>web-clife</title>
-        <script type="text/javascript" src="weblife.js"></script>
-<style>
-.display {
-    margin: auto;
-    padding:20px;
-}
-.ctrlpanel {
-    margin: auto;
-    background-color: lightgray;
-    padding: 20px;
-    width: 50%;
-}
-</style>
-    </head>
+<head>
+    <title>web-clife</title>
+    <script type="text/javascript" src="weblife.js"></script>
+    <style>
+        html {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
 
-    <body onload=ui.init()>
-        <div class="display">
-            <center>
-                <canvas id="theGrid" width="200" height="100" style="border:1px solid #000000;margin:auto;"></canvas> 
-            </center>
+        body {
+            display: flex;
+            height: 100%;
+            margin: 0px;
+            padding: 0px;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-end;
+        }
+
+        .display {
+            border: 1px solid black;
+        }
+
+        .display-container {
+            flex-grow: 9;
+            width: 95%;
+            vertical-align: bottom;
+            background: cyan;
+            padding: 0;
+            margin: 1em;
+        }
+
+        .ctrlpanel {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: left;
+            align-items: flex-start;
+            background-color: lightgray;
+            padding: 1em;
+            margin: 1em;
+        }
+
+        .panelobject {
+            padding: 0.5em;
+        }
+    </style>
+</head>
+
+<body onload=ui.init()>
+    <div class="display-container">
+        <canvas id="theGrid" class="display"></canvas>
+    </div class="display-container">
+    <div class="ctrlpanel">
+        <div class="panelobject"> 
+            <button type="button" onclick="ui.step()">Step</button>
+            <button type="button" onclick="ui.pause()">Pause</button>
+            <button type="button" onclick="ui.play()">Play</button>
+            <span>&nbsp;&nbsp;<span id="playStatus">&#9646;&#9646;</span></span>
         </div>
-
-        <div class="ctrlpanel" style="margin:auto">
-        <button type="button" onclick="ui.step()">Step</button>
-        <button type="button" onclick="ui.pause()">Pause</button>
-        <button type="button" onclick="ui.play()">Play</button>
-        <span>&nbsp;&nbsp;<span id="playStatus">&#9646;&#9646;</span></span>
-
-        <p> 
-        Width: 
-        <input type="text" style="width:4ch" value ="10" id="width"></input>
-        Height:
-        <input type="text" style="width:4ch" value="10" id="height"></input>
-        Density: 
-        <input type="text" style="width:4ch" id="density" value="0.5"></input>
-        <button type="button" onclick="ui.newMap()">New Grid</button>
-        </p>
-
-
-        <p>
-        Rule String (B/S notation): <input type="text" style="width:15ch" id="rulesInput" value="b3/s23"></input>
-        <span><button type="button" onclick="ui.setRules()">Load Ruleset</button></span>
-        </p>
-
-        
-        <p style="margin:auto"><span id="status" style="color:red"></span></p>
+        <div class="panelobject">
+            Width:
+            <input type="text" style="width:4ch" value="10" id="width"></input>
+            Height:
+            <input type="text" style="width:4ch" value="10" id="height"></input>
+            Density:
+            <input type="text" style="width:4ch" id="density" value="0.5"></input>
+            <button type="button" onclick="ui.newMap()">New Grid</button>
         </div>
-    </body>
+        <div class="panelobject">
+            Rule String (B/S notation): <input type="text" style="width:15ch" id="rulesInput" value="b3/s23"></input>
+            <span><button type="button" onclick="ui.setRules()">Load Ruleset</button></span>
+            <p style="margin:auto"><span id="status" style="color:red"></span></p>
+        </div>
+    </div>
+</body>
 </html>
