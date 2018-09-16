@@ -18,33 +18,44 @@
             padding: 0px;
             flex-direction: column;
             align-items: center;
-            justify-content: flex-end;
+            justify-content: space-evenly;
+        }
+
+        .display-contianer {
+            display: flex;
+            justify-content: center; 
+            align-items: center;
+            margin: 1em;
+            width: 95%;
+            height: 70%;
+            flex-basis: 8;
         }
 
         .display {
             border: 1px solid black;
-            margin: 1em;
         }
 
         .ctrlpanel {
-            flex-grow: 1;
+            flex-basis: 2;
             display: flex;
             flex-direction: column;
-            justify-content: left;
-            align-items: flex-start;
+            justify-content: center;
+            align-items: space-evenly;
             background-color: lightgray;
             padding: 1em;
             margin: 1em;
         }
 
         .panelobject {
-            padding: 0.5em;
+            margin: 0.5em;
         }
     </style>
 </head>
 
 <body onload="init()"">
-    <canvas id="display" class="display"></canvas>
+    <div id="displayContainer" class="display-contianer">
+        <canvas id="display" class="display"></canvas> 
+    </div>
     <div class="ctrlpanel">
         <div class="panelobject"> 
             <button type="button" onclick="ui.step()">Step</button>
@@ -62,7 +73,7 @@
             <button type="button" onclick="ui.newMap()">New Grid</button>
         </div>
         <div class="panelobject">
-            Rule String (B/S notation): <input type="text" style="width:15ch" id="rulesInput" value="b3/s23"></input>
+            Rule String <a href="http://www.conwaylife.com/wiki/Rulestring#B.2FS_notation">(B/S notation)</a>: <input type="text" style="width:15ch" id="rulesInput" value="b3/s23"></input>
             <span><button type="button" onclick="ui.setRules()">Load Ruleset</button></span>
             <p style="margin:auto"><span id="status" style="color:red"></span></p>
         </div>

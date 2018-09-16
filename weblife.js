@@ -332,8 +332,9 @@ class Display {
     updateGeometry() {
         this.cols = this.engine.getCols();
         this.rows = this.engine.getRows();
-        let maxWidth = window.innerWidth * 0.75;
-        let maxHeight = window.innerHeight * 0.75;
+        let maxWidth = displayContainer.clientWidth;
+        let maxHeight = displayContainer.clientHeight;
+        console.log("maxWidth: " + maxWidth + "maxHeight" + maxHeight);
         let displayAspectRatio = this.cols / this.rows;
         let containerAspectRatio = maxWidth / maxHeight;
         if (displayAspectRatio > containerAspectRatio) { 
@@ -420,7 +421,6 @@ function floor(x) {
     return x | 0;
 }
 
-// Main initialization function
 function init() {
     ui.init();
     window.onresize = () => {ui.resizeDisplay()};
