@@ -26,11 +26,13 @@
         }
 
         .display-container {
-            flex-grow: 9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             width: 95%;
             vertical-align: bottom;
-            background: cyan;
             padding: 0;
+            flex-grow: 9;
             margin: 1em;
         }
 
@@ -51,9 +53,9 @@
     </style>
 </head>
 
-<body onload=ui.init()>
-    <div class="display-container">
-        <canvas id="theGrid" class="display"></canvas>
+<body onload="init()"">
+    <div id="displayContainer" class="display-container">
+        <canvas id="display" class="display"></canvas>
     </div class="display-container">
     <div class="ctrlpanel">
         <div class="panelobject"> 

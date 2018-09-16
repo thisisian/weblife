@@ -278,7 +278,8 @@ class Display {
         this.left = undefined;
         this.cols = undefined;
         this.rows = undefined;
-        this.canvas = document.getElementById("theGrid");
+        this.canvas = document.getElementById("display");
+        this.container = document.getElementById("displayContainer")
         this.ctx = this.canvas.getContext("2d");
 
         this.canvas.addEventListener("click", (event) => {
@@ -287,7 +288,7 @@ class Display {
             this.update();
         }, false);
 
-        this.loadEngine(this.engine);
+        this.updateGeometry();
         this.update();
     }
 
@@ -300,29 +301,6 @@ class Display {
         let x = floor((clickEvent.pageX - this.left) / this.cellSize);
         let y = floor((clickEvent.pageY - this.top) / this.cellSize);
         return [x,y];
-    }
-
-    /**
-     * Loads engine properties into display.
-     * @param engine Engine which is displayed.
-     */
-    loadEngine(engine) {
-        this.engine = engine;
-        this.cols = this.engine.getCols();
-        this.rows = this.engine.getRows();
-        let maxHeight = 0.5 * window.innerHeight;
-        let maxWidth = 0.7 * window.innerWidth;
-        if (false) { //TODO: Fix this
-            this.canvas.width = maxWidth;
-            this.canvas.height = (this.rows / this.cols)* maxWidth;
-            this.cellSize = this.canvas.width / this.cols;
-        } else {
-            this.canvas.height = maxHeight;
-            this.canvas.width = (this.cols / this.rows) * maxHeight;
-            this.cellSize = this.canvas.height / this.rows;
-        }
-        this.top = this.canvas.offsetTop;
-        this.left = this.canvas.offsetLeft;
     }
 
     /**
@@ -349,10 +327,26 @@ class Display {
     }
 
     /**
-     * Updates dimentions from size of display container
+     * Updates geometry of display on page
      */
-    updateDimentions() {
-
+    updateGeometry() {
+        this.cols = this.engine.getCols();
+        this.rows = this.engine.getRows();
+        let maxWidth = displayContainer.clientWidth;
+        let maxHeight = displayContainer.clientHeight;
+        let displayAspectRatio = this.cols / this.rows;
+        let containerAspectRatio = maxWidth / maxHeight;
+        if (displayAspectRatio > containerAspectRatio) { 
+            this.canvas.width = maxWidth;
+            this.canvas.height = (this.rows / this.cols)* maxWidth;
+            this.cellSize = this.canvas.width / this.cols;
+        } else {
+            this.canvas.height = maxHeight;
+            this.canvas.width = (this.cols / this.rows) * maxHeight;
+            this.cellSize = this.canvas.height / this.rows;
+        }
+        this.top = this.canvas.offsetTop;
+        this.left = this.canvas.offsetLeft;
     }
 }
 
@@ -417,4 +411,10 @@ let ui = {
 
 function floor(x) {
     return x | 0;
+}
+
+// Main initialization function
+function init() {
+    ui.init();
+    window.onresize = display.updateGeometry;
 }
