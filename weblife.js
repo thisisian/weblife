@@ -332,8 +332,8 @@ class Display {
     updateGeometry() {
         this.cols = this.engine.getCols();
         this.rows = this.engine.getRows();
-        let maxWidth = displayContainer.clientWidth;
-        let maxHeight = displayContainer.clientHeight;
+        let maxWidth = window.innerWidth * 0.75;
+        let maxHeight = window.innerHeight * 0.75;
         let displayAspectRatio = this.cols / this.rows;
         let containerAspectRatio = maxWidth / maxHeight;
         if (displayAspectRatio > containerAspectRatio) { 
@@ -363,6 +363,7 @@ let ui = {
     init : function () {
         this.engine = new Engine(10, 10, "b3/s23", 0.5);
         this.display = new Display(this.engine);
+        return this;
     },
 
     newMap : function () {
@@ -400,6 +401,7 @@ let ui = {
             this.engine.setRules(ruleString);
         } catch (error) {
             console.log(error);
+            alert(error.message);
         }
     },
 
@@ -407,6 +409,11 @@ let ui = {
         document.getElementById("status").innerHTML = input;
         console.log(input);
     },
+
+    resizeDisplay: function() {
+        this.display.updateGeometry();
+        this.display.update();
+    }
 };
 
 function floor(x) {
@@ -416,5 +423,5 @@ function floor(x) {
 // Main initialization function
 function init() {
     ui.init();
-    window.onresize = display.updateGeometry;
+    window.onresize = () => {ui.resizeDisplay()};
 }

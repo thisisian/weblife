@@ -23,16 +23,6 @@
 
         .display {
             border: 1px solid black;
-        }
-
-        .display-container {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 95%;
-            vertical-align: bottom;
-            padding: 0;
-            flex-grow: 9;
             margin: 1em;
         }
 
@@ -54,9 +44,7 @@
 </head>
 
 <body onload="init()"">
-    <div id="displayContainer" class="display-container">
-        <canvas id="display" class="display"></canvas>
-    </div class="display-container">
+    <canvas id="display" class="display"></canvas>
     <div class="ctrlpanel">
         <div class="panelobject"> 
             <button type="button" onclick="ui.step()">Step</button>
