@@ -356,7 +356,7 @@ class Display {
  * Holds current engine and display objects as well.
  */
 let ui = {
-    PLAYBACK_SPEED: 50,
+    PLAYBACK_SPEED: 20,
     interval: undefined,
     engine: undefined,
     display: undefined,

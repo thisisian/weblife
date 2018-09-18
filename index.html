@@ -18,7 +18,7 @@
             padding: 0px;
             flex-direction: column;
             align-items: center;
-            justify-content: space-evenly;
+            justify-content: flex-end;
         }
 
         .display-contianer {
@@ -49,6 +49,11 @@
         .panelobject {
             margin: 0.5em;
         }
+        .about-box {
+            position: fixed;
+            bottom: 1em;
+            right: 1em;
+        }
     </style>
 </head>
 
@@ -77,6 +82,11 @@
             <span><button type="button" onclick="ui.setRules()">Load Ruleset</button></span>
             <p style="margin:auto"><span id="status" style="color:red"></span></p>
         </div>
+    </div>
+    <div class="about-box">
+        <a href="./LICENSE">
+            About
+        </a>
     </div>
 </body>
 </html>
